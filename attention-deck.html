@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention Is All You Need - A Non-Tech Student's Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css">
+    <style>
+        .reveal { font-family: 'Segoe UI', system-ui, sans-serif; }
+        .reveal h1, .reveal h2, .reveal h3 { color: #2c3e50; }
+        .reveal .slide-number { color: #7f8c8d; }
+        .reveal ul { display: block; text-align: left; }
+        .reveal ol { display: block; text-align: left; }
+        .reveal table { margin: 1rem auto; border-collapse: collapse; }
+        .reveal th, .reveal td { padding: 0.5rem 1rem; border: 1px solid #dee2e6; }
+        .reveal th { background: #2c3e50; color: white; }
+        .reveal pre { background: #2c3e50; border-radius: 8px; padding: 1rem; overflow-x: auto; }
+        .reveal code { background: #ecf0f1; padding: 0.2em 0.4em; border-radius: 4px; }
+        .analogy-box { background: #e8f4fd; border-left: 4px solid #3498db; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .key-takeaway { background: #e8f8f0; border-left: 4px solid #27ae60; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; font-weight: 500; }
+        .confusing-part { background: #fdf2e9; border-left: 4px solid #e67e22; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .walkthrough-box { background: #fef9e7; border: 2px solid #f39c12; padding: 1rem; margin: 1rem 0; border-radius: 8px; }
+        .definition-box { background: #ebf5fb; border-left: 4px solid #2980b9; padding: 0.75rem; margin: 0.5rem 0; border-radius: 0 6px 6px 0; font-size: 0.9em; }
+        .visual-diagram { background: #f8f9fa; border: 1px solid #dee2e6; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85em; overflow-x: auto; white-space: pre; }
+        .emoji { font-size: 1.5em; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title Slide -->
+            <section>
+                <h1>Attention Is All You Need</h1>
+                <h3>The Paper That Changed AI Forever (Explained Like You're a College Student)</h3>
+                <p><strong>By the Google Brain Team (2017)</strong></p>
+                <p><em>Presentation by a non-CS major who actually read the paper</em></p>
+            </section>
+
+            <!-- Why Should You Care? -->
+            <section>
+                <h2>Why Should a Non-Tech Major Care? 🤔</h2>
+                <div class="analogy-box">
+                    <strong>This paper is the "DNA" of modern AI.</strong> ChatGPT, Claude, Gemini, Midjourney — they're all built on the architecture this paper invented.
+                </div>
+                <ul>
+                    <li><strong>Before 2017:</strong> AI processed text word-by-word (slow, forgetful)</li>
+                    <li><strong>After 2017:</strong> AI processes <em>all words at once</em> and understands relationships between them</li>
+                    <li><strong>Result:</strong> The AI revolution we're living through today</li>
+                </ul>
+                <p><strong>You don't need to code to understand the idea.</strong> You just need to understand <em>attention</em>.</p>
+            </section>
+
+            <!-- The Old Way: RNNs -->
+            <section>
+                <h2>The Problem: Reading Word-by-Word Like a Goldfish 🐟</h2>
+                <p><strong>Recurrent Neural Networks (RNNs)</strong> — the dominant approach before 2017:</p>
+                <div class="analogy-box">
+                    Imagine reading a book but you can only remember the last sentence. By chapter 3, you've forgotten chapter 1.<br><br>
+                    It's like the game <strong>Telephone</strong> — the message degrades the further it travels.
+                </div>
+                <p><strong>How RNNs process "The cat sat on the mat because it was tired":</strong></p>
+                <pre>
+Step 1: Read "The"       → Memory: ["The"]
+Step 2: Read "cat"       → Memory: ["The", "cat"]
+Step 3: Read "sat"       → Memory: ["The", "cat", "sat"]
+...
+Step 9: Read "it"        → Memory: [..., "because", "it"]
+                            ↑ PROBLEM: "cat" is long gone!
+                </pre>
+                <p><strong>Three fatal flaws:</strong></p>
+                <ol>
+                    <li><strong>Sequential = Slow</strong> — Must finish word 1 before starting word 2. GPUs (graphics cards, great at doing many things at once) sit mostly idle.</li>
+                    <li><strong>Fading Memory</strong> — By the time you reach "it", the connection to "cat" has faded. Long-distance relationships get lost.</li>
+                    <li><strong>No Global View</strong> — Each word only sees what came <em>before</em>, never what comes <em>after</em>.</li>
+                </ol>
+            </section>
+
+            <!-- The Insight: Attention -->
+            <section>
+                <h2>The Big Idea: Read Everything At Once With a Highlighter 🖍️</h2>
+                <div class="analogy-box">
+                    Instead of reading left-to-right and forgetting, <strong>look at ALL words simultaneously</strong> and highlight which ones relate to each other.
+                </div>
+                <p><strong>Human example:</strong> When you read "<strong>The cat</strong> sat on <strong>the mat</strong> because <strong>it</strong> was tired"</p>
+                <p>Your brain instantly links:</p>
+                <ul>
+                    <li>"it" → "<strong>cat</strong>" (not "mat"!)</li>
+                    <li>"sat" → "<strong>cat</strong>" (who did the sitting)</li>
+                    <li>"tired" → "<strong>cat</strong>" (who is tired)</li>
+                </ul>
+                <div class="key-takeaway">
+                    <strong>The Transformer does this mathematically, for every word, all at once.</strong> No sequential processing. No fading memory.
+                </div>
+            </section>
+
+            <!-- Walkthrough Slide -->
+            <section>
+                <h2>Walkthrough: How "it" Finds "cat" — Step by Step 🎯</h2>
+                <p>Let's trace exactly what happens for the word <strong>"it"</strong> in our sentence:</p>
+                <blockquote>"<strong>The cat</strong> sat on <strong>the mat</strong> because <strong>it</strong> was tired"</blockquote>
+
+                <div class="walkthrough-box">
+                    <strong>Step 1: "it" asks a Question (Query)</strong><br>
+                    "it" creates a Query vector — think of it as a search query: <em>"I'm a pronoun. Who am I referring to?"</em>
+                </div>
+
+                <div class="walkthrough-box">
+                    <strong>Step 2: Every word offers an Answer (Key)</strong><br>
+                    Each word creates a Key vector — its "profile":<br>
+                    • "cat" → <em>"I'm a singular noun, subject of 'sat'"</em><br>
+                    • "mat" → <em>"I'm a singular noun, object of 'on'"</em><br>
+                    • "the" → <em>"I'm an article"</em><br>
+                    • "was" → <em>"I'm a verb"</em><br>
+                    • ...and so on
+                </div>
+
+                <div class="walkthrough-box">
+                    <strong>Step 3: Compare Question to Answers (Dot Product → Scores)</strong><br>
+                    "it" compares its Query against every Key. High score = good match.<br>
+                    <em>(dot product = multiply corresponding numbers and sum them up — measures similarity)</em>
+                    <table>
+                        <thead><tr><th>Word</th><th>Match Score (raw)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>cat</strong></td><td><strong>0.9</strong> ← Strong match!</td></tr>
+                            <tr><td><strong>mat</strong></td><td>0.2</td></tr>
+                            <tr><td>the</td><td>0.1</td></tr>
+                            <tr><td>sat</td><td>0.3</td></tr>
+                            <tr><td>because</td><td>0.05</td></tr>
+                            <tr><td>was</td><td>0.15</td></tr>
+                            <tr><td>tired</td><td>0.1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="walkthrough-box">
+                    <strong>Step 4: Turn Scores into Percentages (Softmax)</strong><br>
+                    Softmax = "make all scores positive and sum to 100%"
+                    <table>
+                        <thead><tr><th>Word</th><th>Attention Weight (% of focus)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>cat</strong></td><td><strong>70%</strong> ← Winner!</td></tr>
+                            <tr><td><strong>mat</strong></td><td>10%</td></tr>
+                            <tr><td>sat</td><td>8%</td></tr>
+                            <tr><td>the</td><td>3%</td></tr>
+                            <tr><td>was</td><td>4%</td></tr>
+                            <tr><td>others</td><td>5%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="walkthrough-box">
+                    <strong>Step 5: Weighted Sum = New "it" (Value)</strong><br>
+                    "it" now becomes a blend of all words, but <strong>70% "cat"</strong>.<br>
+                    The model has effectively <em>learned</em> that "it" → "cat"!
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>This happens for EVERY word, SIMULTANEOUSLY.</strong> "cat" also looks at "sat", "mat" looks at "on", etc. All relationships computed in one shot.
+                </div>
+            </section>
+
+            <!-- Multi-Head Attention -->
+            <section>
+                <h2>Multi-Head Attention: 8 Highlighters, Different Colors 🎨</h2>
+                <div class="analogy-box">
+                    One person reading with one highlighter = one set of relationships.<br>
+                    <strong>8 people each with a different colored highlighter</strong> = 8 different relationship types discovered simultaneously.
+                </div>
+                <p><strong>What researchers found different heads tend to specialize in:</strong></p>
+                <ul>
+                    <li>🔵 Head 1: <strong>Grammar</strong> — subject-verb agreement ("cats <em>are</em>" vs "cat <em>is</em>")</li>
+                    <li>🟢 Head 2: <strong>Pronouns</strong> — "it" → "cat", "she" → "Mary"</li>
+                    <li>🟡 Head 3: <strong>Long-distance</strong> — connecting words far apart</li>
+                    <li>🟠 Head 4: <strong>Negation</strong> — "not good" ≠ "good"</li>
+                    <li>🟣 Head 5: <strong>Syntax</strong> — adjective → noun, verb → object</li>
+                    <li>...and 3 more!</li>
+                </ul>
+                <div class="definition-box">
+                    <strong>Concatenate</strong> = glue the 8 perspectives together side-by-side<br>
+                    <strong>Project</strong> = compress back down to original size (like zipping a file)
+                </div>
+                <p><strong>Then:</strong> Concatenate all 8 heads → Project back to original dimension</p>
+                <div class="key-takeaway">
+                    This is why Transformers understand nuance: they're not looking through one lens — they're using 8+ lenses simultaneously, each catching different patterns.
+                </div>
+            </section>
+
+            <!-- Positional Encoding -->
+            <section>
+                <h2>But Wait — If Everything Is Simultaneous, How Does Order Matter? 🤷</h2>
+                <div class="confusing-part">
+                    <strong>Big problem:</strong> Pure attention is "permutation-invariant" — fancy word for:<br>
+                    "<strong>Cat eats mouse</strong>" looks <strong>identical</strong> to "<strong>Mouse eats cat</strong>"!
+                </div>
+                <div class="analogy-box">
+                    <strong>Solution: Position Tags</strong> — Stamp each word with its position number before the attention step.
+                </div>
+                <p><strong>Think of it like this:</strong></p>
+                <table>
+                    <thead><tr><th>Without Position</th><th>With Position</th></tr></thead>
+                    <tbody>
+                        <tr><td>"cat"</td><td>"cat @ position 2"</td></tr>
+                        <tr><td>"eats"</td><td>"eats @ position 3"</td></tr>
+                        <tr><td>"mouse"</td><td>"mouse @ position 4"</td></tr>
+                    </tbody>
+                </table>
+                <p>Now "cat @ pos 2 eats @ pos 3 mouse @ pos 4" ≠ "mouse @ pos 2 eats @ pos 3 cat @ pos 4"</p>
+
+                <div class="visual-diagram">
+How the position tag works (simplified):
+
+  Word embedding (meaning)  +  Position encoding (where)  =  Position-aware word
+  [0.2, -0.1, 0.5, ...]     +  [sin(2), cos(2), sin(4), ...]  =  [0.2+sin(2), -0.1+cos(2), ...]
+
+  The model learns to "read" these position fingerprints.
+  (Different frequencies for different dimensions = unique fingerprint per position)
+                </div>
+
+                <p><strong>Why sine/cosine waves? (No formula to memorize!)</strong></p>
+                <ul>
+                    <li>✅ Works for ANY sentence length — even longer than training data</li>
+                    <li>✅ Position 5 and Position 6 always have a consistent mathematical relationship</li>
+                    <li>✅ <strong>Zero extra parameters</strong> — the model doesn't need to "learn" positions, they're fixed</li>
+                </ul>
+                <div class="key-takeaway">
+                    <strong>Parameters = numbers the model learns during training.</strong> Fixed position encodings = free information, no learning required.
+                </div>
+            </section>
+
+            <!-- The Architecture -->
+            <section>
+                <h2>The Full Picture: Encoder + Decoder = Translator 🌐</h2>
+                <div class="analogy-box">
+                    <strong>Encoder</strong> = "Deep Reader" — Reads input (English), builds rich understanding<br>
+                    <strong>Decoder</strong> = "Writer" — Uses that understanding to generate output (French), one word at a time
+                </div>
+
+                <div class="visual-diagram">
+ENGLISH SENTENCE
+      │
+      ▼
+┌─────────────────────────────────────┐
+│           ENCODER (×6 layers)       │
+│  ┌─────────────────────────────┐    │
+│  │ Self-Attention: all words   │    │  ← "cat" links to "sat", "it" links to "cat"
+│  │ talk to all words           │    │
+│  ├─────────────────────────────┤    │
+│  │ Feed-Forward: process each  │    │  ← Think about each word individually
+│  │ word's gathered info        │    │
+│  └─────────────────────────────┘    │
+└─────────────────────────────────────┘
+      │
+      ▼
+[RICH MEANING REPRESENTATION]
+      │
+      ▼
+┌─────────────────────────────────────┐
+│           DECODER (×6 layers)       │
+│  ┌─────────────────────────────┐    │
+│  │ Masked Self-Attention       │    │  ← "Le" can only see "Le", not "chat"
+│  │ (can't peek at future!)     │    │
+│  ├─────────────────────────────┤    │
+│  │ Cross-Attention             │    │  ← "chat" looks at English "cat"
+│  │ (links to Encoder output)   │    │
+│  ├─────────────────────────────┤    │
+│  │ Feed-Forward                │    │
+│  └─────────────────────────────┘    │
+└─────────────────────────────────────┘
+      │
+      ▼
+FRENCH SENTENCE: "Le chat..."
+                </div>
+
+                <div class="definition-box">
+                    <strong>Masked</strong> = When generating word #3, you can only see words #1-2. Prevents cheating!<br>
+                    <strong>Cross-Attention</strong> = Decoder questions, Encoder answers. "What English word should I translate now?"
+                </div>
+
+                <div class="definition-box">
+                    <strong>Residual connection</strong> = Shortcut letting info skip a layer (prevents fading in deep networks)<br>
+                    <strong>LayerNorm</strong> = Keeps numbers in a healthy range so training stays stable
+                </div>
+
+                <div class="definition-box">
+                    <strong>Note:</strong> This is the translation architecture (Encoder + Decoder). For text generation like ChatGPT, there's <strong>no Encoder</strong> — just the Decoder generating from scratch, one word at a time.
+                </div>
+            </section>
+
+            <!-- Results -->
+            <section>
+                <h2>The Results: Better, Faster, Cheaper 📊</h2>
+                <p><strong>Translation Quality (BLEU = translation score, 0-100, higher = better):</strong></p>
+                <table>
+                    <thead>
+                        <tr><th>Model</th><th>English→German</th><th>English→French</th><th>Training Compute</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ConvS2S (prev best)</td><td>25.16</td><td>40.46</td><td>9.6 quintillion ops</td></tr>
+                        <tr><td>GNMT + RL (Google's old best)</td><td>24.6</td><td>39.92</td><td>23 quintillion ops</td></tr>
+                        <tr><td><strong>Transformer (base)</strong></td><td><strong>27.3</strong></td><td><strong>38.1</strong></td><td><strong>3.3 quintillion ops</strong></td></tr>
+                        <tr><td><strong>Transformer (big)</strong></td><td><strong>28.4</strong></td><td><strong>41.8</strong></td><td><strong>23 quintillion ops</strong></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="key-takeaway">
+                    <strong>2+ BLEU points better</strong> than previous best — at <strong>1/4 to 1/7 the training cost</strong>!
+                </div>
+
+                <p><strong>Also generalized beyond translation:</strong></p>
+                <ul>
+                    <li><strong>English Parsing</strong> (breaking sentences into grammatical structure): <strong>91.3 F1</strong> — beat most prior work <em>with no task-specific tuning</em></li>
+                </ul>
+
+                <div class="definition-box">
+                    <strong>FLOPs</strong> = Floating Point Operations = total math work. Fewer = cheaper, faster, greener.<br>
+                    <strong>BLEU</strong> = Bilingual Evaluation Understudy. Standard translation quality metric (0-100).<br>
+                    <strong>Parsing</strong> = Analyzing grammatical structure. "The cat sat" → [Sentence [NP The cat] [VP sat]].<br>
+                    <strong>F1</strong> = Balance of precision and recall (0-100, higher = better).
+                </div>
+            </section>
+
+            <!-- Why Parallelization Matters -->
+            <section>
+                <h2>Why Parallelization = Game Changer ⚡</h2>
+                <div class="analogy-box">
+                    <strong>RNN:</strong> One chef cooking 10 dishes sequentially<br>
+                    <strong>Transformer:</strong> 10 chefs cooking 10 dishes simultaneously
+                </div>
+
+                <table>
+                    <thead>
+                        <tr><th>Approach</th><th>Time Grows With Sentence Length?</th><th>Word A → Word B Path Length</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>RNN (sequential)</td><td><strong>Yes</strong> — 2× longer = 2× slower</td><td><strong>Many steps</strong> — must hop word by word</td></tr>
+                        <tr><td>Convolutional</td><td>No</td><td>Logarithmic steps</td></tr>
+                        <tr><td><strong>Self-Attention</strong></td><td><strong>No — constant time</strong></td><td><strong>1 step</strong> — direct connection!</td></tr>
+                    </tbody>
+                </table>
+
+                <p><strong>O(1) path length</strong> = any word can directly "talk to" any other word in <strong>one layer</strong>.</p>
+
+                <div class="key-takeaway">
+                    This is why we can train on <strong>massive datasets (billions of words)</strong> — GPUs finally get fully utilized! The Transformer unlocked internet-scale training.
+                </div>
+            </section>
+
+            <!-- Attention Visualizations -->
+            <section>
+                <h2>The Coolest Part: We Can See What It's "Thinking" 🔍</h2>
+                <p>The paper shows actual attention patterns learned <strong>without any human labels</strong>:</p>
+                <div class="analogy-box">
+                    The model <em>discovered linguistics on its own</em>!
+                </div>
+
+                <p><strong>Real examples from the paper:</strong></p>
+                <ol>
+                    <li><strong>Coreference Resolution</strong> — "making...more difficult" (verb links to object 10+ words away)
+                        <ul><li>Head attends from "making" → "difficult" across the whole clause</li></ul>
+                    </li>
+                    <li><strong>Anaphora Resolution</strong> — "its" → "The Law" (pronoun finds its antecedent)
+                        <ul><li>Extremely sharp attention: "its" puts ~90% weight on "Law"</li></ul>
+                    </li>
+                    <li><strong>Syntactic Structure</strong> — Different heads = different grammar jobs
+                        <ul>
+                            <li>Head A: adjectives → nouns they modify</li>
+                            <li>Head B: verbs → their subjects/objects</li>
+                            <li>Head C: prepositions → their objects</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="key-takeaway">
+                    We can literally <em>visualize</em> what the model focuses on — rare for neural networks! This interpretability helps researchers debug and improve models.
+                </div>
+            </section>
+
+            <!-- Key Takeaways -->
+            <section>
+                <h2>Key Takeaways (Plain English) 🎓</h2>
+
+                <div class="key-takeaway">
+                    <strong>1. Attention ≠ "Paying attention"</strong> — It's a math operation that computes "how much does each word relate to every other word" all at once.
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>2. The Transformer killed the sequential bottleneck</strong> — No more word-by-word processing. Enabled training on internet-scale data.
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>3. It's not magic — it's matrix multiplication + softmax</strong> — Q, K, V matrices + "turn scores into percentages" = relationship modeling.
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>4. Position tags fix the "order doesn't matter" problem</strong> — Fixed sine/cosine stamps = free position info, no learning needed.
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>5. Multi-head = multiple perspectives</strong> — Like 8 readers with different colored highlighters, each catching different patterns.
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>6. This architecture powers everything today</strong> — GPT, BERT, T5, LLaMA, Claude, Gemini, Midjourney, Sora...
+                </div>
+            </section>
+
+            <!-- What Made It Possible -->
+            <section>
+                <h2>What Made This Possible in 2017? 🕰️</h2>
+                <table>
+                    <thead><tr><th>Ingredient</th><th>Status in 2017</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Attention mechanism</strong></td><td>Known since 2014 (Bahdanau et al.)</td></tr>
+                        <tr><td><strong>Multi-head idea</strong></td><td>Novel contribution</td></tr>
+                        <tr><td><strong>Positional encodings</strong></td><td>Novel (sinusoidal)</td></tr>
+                        <tr><td><strong>GPU parallelization</strong></td><td>Mature (CUDA, cuDNN)</td></tr>
+                        <tr><td><strong>Large datasets</strong></td><td>WMT (4.5M - 36M sentence pairs)</td></tr>
+                        <tr><td><strong>Adam optimizer</strong></td><td>Standard (2015)</td></tr>
+                        <tr><td><strong>LayerNorm / Residuals</strong></td><td>Standard (2016)</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="analogy-box">
+                    The paper didn't invent new math — it <strong>combined existing pieces in the right way</strong> at the right time.
+                </div>
+
+                <p><strong>Lesson for any field:</strong> Breakthroughs often come from <strong>synthesis</strong>, not invention.</p>
+            </section>
+
+            <!-- Limitations & Future Work -->
+            <section>
+                <h2>What The Paper Admitted It Couldn't Do (Yet) 🚧</h2>
+                <blockquote>
+                    "We plan to extend the Transformer to problems involving input and output modalities other than text and to investigate local, restricted attention mechanisms to efficiently handle large inputs and outputs such as images, audio and video. Making generation less sequential is another research goal of ours."
+                </blockquote>
+
+                <p><strong>What happened next (the paper was a foundation, not the finish line):</strong></p>
+                <ul>
+                    <li><strong>2018:</strong> BERT (encoder-only) → understanding tasks (classification, search)</li>
+                    <li><strong>2018:</strong> GPT (decoder-only) → generation tasks (writing, coding)</li>
+                    <li><strong>2020:</strong> Vision Transformer (ViT) → images as "sequences of patches"</li>
+                    <li><strong>2021+:</strong> Multimodal models (images + text + audio together)</li>
+                    <li><strong>2022+:</strong> Sparse attention, FlashAttention — handling much longer context</li>
+                </ul>
+
+                <div class="key-takeaway">
+                    The real impact came from what <strong>thousands of researchers built on top</strong>. This paper was the spark.
+                </div>
+            </section>
+
+            <!-- TL;DR -->
+            <section>
+                <h2>TL;DR: The Paper in 3 Sentences 📝</h2>
+                <blockquote>
+                    "We replaced recurrence with attention."<br><br>
+                    "It parallelizes beautifully."<br><br>
+                    "It works better, faster, and we can see why."
+                </blockquote>
+
+                <hr style="margin: 2rem 0;">
+
+                <h3>Questions? 🙋</h3>
+                <p><small>
+                    Slides: github.com/your-repo/attention-deck<br>
+                    Paper: arxiv.org/abs/1706.03762<br>
+                    Blog that helped me: ai.plainenglish.io/i-finally-understood-attention...
+                </small></p>
+
+                <hr style="margin: 2rem 0;">
+
+                <p><strong>Appendix: The Math (If You're Curious)</strong></p>
+            </section>
+
+            <!-- Appendix: The Math -->
+            <section>
+                <h2>Appendix: The Actual Math 🧮</h2>
+
+                <h3>Scaled Dot-Product Attention</h3>
+                <pre>Attention(Q, K, V) = softmax(QKᵀ / √d_k) V</pre>
+                <ul>
+                    <li>Q: (batch, seq_len, d_k) — Queries</li>
+                    <li>K: (batch, seq_len, d_k) — Keys</li>
+                    <li>V: (batch, seq_len, d_v) — Values</li>
+                    <li>QKᵀ: (batch, seq_len, seq_len) — <strong>attention scores matrix</strong></li>
+                    <li>/√d_k: scaling (prevents large values killing gradients)</li>
+                    <li>softmax: row-wise, sums to 1 → <strong>attention weights</strong></li>
+                    <li>×V: (batch, seq_len, d_v) — <strong>output</strong></li>
+                </ul>
+
+                <h3>Multi-Head Attention</h3>
+                <pre>head_i = Attention(QWᵢᵠ, KWᵢᵏ, VWᵢᵛ)
+MultiHead(Q,K,V) = Concat(head₁...headₕ)Wᴼ</pre>
+
+                <h3>Feed-Forward Network (per position, same weights across positions)</h3>
+                <pre>FFN(x) = max(0, xW₁ + b₁)W₂ + b₂</pre>
+                <p>d_model=512 → d_ff=2048 → d_model=512 (ReLU in middle)</p>
+            </section>
+
+            <!-- Appendix: Architecture Details -->
+            <section>
+                <h2>Appendix: Architecture Specs 📐</h2>
+                <table>
+                    <thead><tr><th>Component</th><th>Base Model</th><th>Big Model</th></tr></thead>
+                    <tbody>
+                        <tr><td>Layers (N)</td><td>6</td><td>6</td></tr>
+                        <tr><td>d_model</td><td>512</td><td>1024</td></tr>
+                        <tr><td>d_ff</td><td>2048</td><td>4096</td></tr>
+                        <tr><td>Heads (h)</td><td>8</td><td>16</td></tr>
+                        <tr><td>d_k = d_v</td><td>64</td><td>64</td></tr>
+                        <tr><td>Parameters</td><td>65M</td><td>213M</td></tr>
+                        <tr><td>Dropout</td><td>0.1</td><td>0.3</td></tr>
+                        <tr><td>Training Steps</td><td>100K</td><td>300K</td></tr>
+                        <tr><td>Training Time</td><td>12 hours</td><td>3.5 days</td></tr>
+                        <tr><td>GPUs</td><td>8×P100</td><td>8×P100</td></tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Regularization:</strong></p>
+                <ul>
+                    <li>Residual dropout: 0.1 (base), 0.3 (big)</li>
+                    <li>Label smoothing: ε=0.1 (hurts perplexity, helps BLEU)</li>
+                    <li>Checkpoint averaging (last 5 base / 20 big)</li>
+                </ul>
+
+                <p><strong>Optimizer:</strong> Adam (β₁=0.9, β₂=0.98, ε=10⁻⁹) with custom LR schedule:</p>
+                <pre>lrate = d_model⁻⁰·⁵ × min(step⁻⁰·⁵, step × warmup⁻¹·⁵)</pre>
+                <p>warmup = 4000 steps</p>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: true,
+            transition: 'slide',
+            controls: true,
+            progress: true,
+            center: true,
+        });
+    </script>
+</body>
+</html>
